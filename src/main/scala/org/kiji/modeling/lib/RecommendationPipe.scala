@@ -25,6 +25,7 @@ import com.twitter.scalding.FieldConversions
 import com.twitter.scalding.TupleConversions
 
 import org.kiji.express.repl.Implicits.pipeToRichPipe
+import org.kiji.modeling.framework.ModelPipeConversions
 
 /**
  * This class provides extensions to Scalding's RichPipe in order to perform recommendations. There
@@ -36,7 +37,8 @@ import org.kiji.express.repl.Implicits.pipeToRichPipe
  */
 class RecommendationPipe(val pipe: Pipe)
     extends FieldConversions
-    with TupleConversions {
+    with TupleConversions
+    with ModelPipeConversions {
   /**
    * This function takes profile information (e.g. a history of purchases) or order data and outputs
    * smaller subsets of co-occurring items. If the minSetSize and maxSetSize is 2, it will create
@@ -57,7 +59,8 @@ class RecommendationPipe(val pipe: Pipe)
   def prepareItemSets[T](
       fieldSpec: (Fields, Fields),
       minSetSize: Int = 2,
-      maxSetSize: Int = 5)
+      maxSetSize: Int = 5,
+      separator: String = ",")
       (implicit ordering: Ordering[T]): Pipe = {
     val (fromFields, toFields) = fieldSpec
     pipe
@@ -66,7 +69,7 @@ class RecommendationPipe(val pipe: Pipe)
             (minSetSize to maxSetSize).flatMap(basket.sorted.combinations)
           }
         }
-        .map(toFields -> toFields) { itemSets: Seq[T] => itemSets.mkString(",") }
+        .map(toFields -> toFields) { itemSets: Seq[T] => itemSets.mkString(separator) }
   }
 
   /**
@@ -137,5 +140,53 @@ class RecommendationPipe(val pipe: Pipe)
           }
         }
         .filter(resultField) { support: Double => (support >= supportThreshold) }
+  }
+
+  /**
+   * Calculates the Jaccard Similarity between two pairs of items. Assumes the data is stored
+   * in an entity-centric manner.
+   *
+   * @param fieldSpec is the mapping from the field containing items related to one entity
+   *     (e.g. purchases of 1 person) to the field that will hold the result.
+   * @param separator to use between pairs of items. Default = ","
+   * @tparam T is the type of the incoming item IDs.
+   * @return a pipe containing pairs of items with their Jaccard similarity.
+   */
+  def simpleItemItemJaccardSimilarity[T](
+      fieldSpec: (Fields, Fields),
+      separator: String = ","): Pipe = {
+    val (itemsetField, resultField) = fieldSpec
+    // For each item, find the number of entities (orders, customers) this appears in
+    // and keep it around in a pipe to be used for calculating the union
+    val productCounts = pipe.flatMap(itemsetField -> 'itemId) {
+          itemset: Stream[T] => itemset.distinct
+        }
+        .groupBy('itemId) { _.size('itemCount) }
+
+    // first calculate the intersection, i.e. number of rows in which two items occur together
+    pipe.prepareItemSets(itemsetField -> 'itemPairs, 2, 2)
+        .groupBy('itemPairs) { _.size('itemPairCount) }
+        // now calculate union, i.e. number of pairs in which either one of the other item appear
+        .map('itemPairs -> 'item1, 'item2) {
+          itemPair: String => {
+            val items = itemPair.split(separator)
+            (items(0), items(1))
+          }
+        }
+        .joinWithSmaller('item1 -> 'itemId, productCounts)
+        .rename('itemCount -> 'item1Count)
+        .joinWithSmaller('item2 -> 'itemId, productCounts)
+        .rename('itemCount -> 'item2Count)
+        .map(('itemPairCount, 'item1Count, 'item2Count) -> 'itemUnionCount) {
+          counts: (Long, Long, Long) => {
+            val (itemPairCount, item1Count, item2Count) = counts
+            // |union(A, B)| = |A| + |B| + |Intersection(A, B)|
+            item1Count + item2Count - itemPairCount
+          }
+        }
+        // find the Jaccard similarity
+        .map(('itemPairCount, 'itemUnionCount) -> resultField) {
+          counts: (Long, Long) => counts._1 / counts._2
+        }
   }
 }
