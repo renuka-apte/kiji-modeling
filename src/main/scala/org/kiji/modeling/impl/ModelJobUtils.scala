@@ -246,7 +246,7 @@ object ModelJobUtils {
           val columnRequest = ColumnRequestInput(
             columnName = expressColumnRequest.name,
             maxVersions = expressColumnRequest.maxVersions,
-            filter = expressColumnRequest.filter.map { _.toKijiColumnFilter })
+            filter = expressColumnRequest.filter)
           columnRequest -> expressColumnRequest.name
         }
         .toMap

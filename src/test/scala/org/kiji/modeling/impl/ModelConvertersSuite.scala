@@ -24,15 +24,17 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import org.kiji.express.flow.AndFilter
+import org.kiji.express.flow.ColumnRangeFilter
+import org.kiji.express.flow.ExpressColumnFilter
+import org.kiji.express.flow.OrFilter
+import org.kiji.express.flow.RegexQualifierFilter
 import org.kiji.modeling.ExtractFn
 import org.kiji.modeling.Extractor
 import org.kiji.modeling.Preparer
 import org.kiji.modeling.ScoreFn
 import org.kiji.modeling.Scorer
 import org.kiji.modeling.Trainer
-import org.kiji.modeling.config.AndFilter
-import org.kiji.modeling.config.ColumnRangeFilter
-import org.kiji.modeling.config.ExpressColumnFilter
 import org.kiji.modeling.config.ExpressColumnRequest
 import org.kiji.modeling.config.ExpressDataRequest
 import org.kiji.modeling.config.FieldBinding
@@ -43,10 +45,8 @@ import org.kiji.modeling.config.KijiOutputSpec
 import org.kiji.modeling.config.KijiSingleColumnOutputSpec
 import org.kiji.modeling.config.ModelDefinition
 import org.kiji.modeling.config.ModelEnvironment
-import org.kiji.modeling.config.OrFilter
 import org.kiji.modeling.config.OutputSpec
 import org.kiji.modeling.config.PrepareEnvironment
-import org.kiji.modeling.config.RegexQualifierFilter
 import org.kiji.modeling.config.ScoreEnvironment
 import org.kiji.modeling.config.SequenceFileSourceSpec
 import org.kiji.modeling.config.TextSourceSpec

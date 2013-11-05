@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import org.kiji.express.flow.RegexQualifierFilter
 import org.kiji.schema.KijiDataRequest
 import org.kiji.schema.filter.RegexQualifierColumnFilter
 

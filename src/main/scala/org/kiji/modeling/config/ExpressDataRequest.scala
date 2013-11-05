@@ -22,6 +22,7 @@ package org.kiji.modeling.config
 import org.kiji.annotations.ApiAudience
 import org.kiji.annotations.ApiStability
 import org.kiji.annotations.Inheritance
+import org.kiji.express.flow.ExpressColumnFilter
 import org.kiji.schema.KijiColumnName
 import org.kiji.schema.KijiDataRequest
 

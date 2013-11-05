@@ -25,6 +25,10 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
+import org.kiji.express.flow.AndFilter
+import org.kiji.express.flow.ColumnRangeFilter
+import org.kiji.express.flow.ExpressColumnFilter
+import org.kiji.express.flow.RegexQualifierFilter
 import org.kiji.express.util.Resources.resourceAsString
 import org.kiji.modeling.avro.AvroColumn
 import org.kiji.modeling.avro.AvroColumnRangeFilter

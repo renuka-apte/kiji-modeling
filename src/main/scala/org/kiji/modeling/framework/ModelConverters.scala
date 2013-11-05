@@ -21,6 +21,11 @@ package org.kiji.modeling.framework
 
 import scala.collection.JavaConverters._
 
+import org.kiji.express.flow.AndFilter
+import org.kiji.express.flow.ColumnRangeFilter
+import org.kiji.express.flow.ExpressColumnFilter
+import org.kiji.express.flow.OrFilter
+import org.kiji.express.flow.RegexQualifierFilter
 import org.kiji.modeling.Evaluator
 import org.kiji.modeling.Extractor
 import org.kiji.modeling.Preparer
@@ -49,10 +54,7 @@ import org.kiji.modeling.avro.AvroScoreEnvironment
 import org.kiji.modeling.avro.AvroSequenceFileSourceSpec
 import org.kiji.modeling.avro.AvroTextSourceSpec
 import org.kiji.modeling.avro.AvroTrainEnvironment
-import org.kiji.modeling.config.AndFilter
-import org.kiji.modeling.config.ColumnRangeFilter
 import org.kiji.modeling.config.EvaluateEnvironment
-import org.kiji.modeling.config.ExpressColumnFilter
 import org.kiji.modeling.config.ExpressColumnRequest
 import org.kiji.modeling.config.ExpressDataRequest
 import org.kiji.modeling.config.FieldBinding
@@ -63,10 +65,8 @@ import org.kiji.modeling.config.KijiOutputSpec
 import org.kiji.modeling.config.KijiSingleColumnOutputSpec
 import org.kiji.modeling.config.ModelDefinition
 import org.kiji.modeling.config.ModelEnvironment
-import org.kiji.modeling.config.OrFilter
 import org.kiji.modeling.config.OutputSpec
 import org.kiji.modeling.config.PrepareEnvironment
-import org.kiji.modeling.config.RegexQualifierFilter
 import org.kiji.modeling.config.ScoreEnvironment
 import org.kiji.modeling.config.SequenceFileSourceSpec
 import org.kiji.modeling.config.TextSourceSpec
