@@ -49,6 +49,27 @@ class RecommendationPipe(val pipe: Pipe)
     with ModelPipeConversions {
 
   /**
+   * This function counts the number of tuples in the pipe.
+   * NOTE: This is an expensive operation.
+   *
+   * @param numReducers is the number of reducers to be used for this operation.
+   * @return a pipe with a field called "total" that contains the number of tuples.
+   */
+  def count(numReducers: Int = 1): Pipe = {
+    if (numReducers > 1) {
+      pipe
+          // map each row to some reducer to try to parallelize
+          .map(Fields.FIRST -> 'reduceGroup) {
+            f: Any => f.toString.hashCode % numReducers
+          }
+          .groupBy('reduceGroup) { _.size('groupCount) }
+          .groupAll { _.sum('groupCount -> 'total) }
+    } else {
+      pipe.groupAll { _.size('total) }
+    }
+  }
+
+  /**
    * This function takes profile information (e.g. a history of purchases) or order data and outputs
    * smaller subsets of co-occurring items. If the minSetSize and maxSetSize is 2, it will create
    * tuples of items that are found within the same history/order. This will typically be used to
