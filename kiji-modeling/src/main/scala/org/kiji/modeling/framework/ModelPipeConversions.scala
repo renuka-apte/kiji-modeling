@@ -21,7 +21,7 @@ package org.kiji.modeling.framework
 
 import cascading.pipe.Pipe
 import cascading.flow.FlowDef
-import com.twitter.scalding.Mode
+import com.twitter.scalding.{RichPipe, Mode}
 
 import org.kiji.annotations.ApiAudience
 import org.kiji.annotations.ApiStability
@@ -62,4 +62,5 @@ trait ModelPipeConversions {
       source: KijiSource)(
       implicit flowDef: FlowDef,
       mode: Mode): RecommendationPipe = new RecommendationPipe(source.read(flowDef, mode))
+
 }
